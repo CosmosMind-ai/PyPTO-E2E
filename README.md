@@ -24,20 +24,20 @@ All measurements on physical Ascend 910C hardware (DP8 / TP1, BF16 official weig
 
 ### What the patch changes
 
-`patches/champion.diff` — a unified diff against PyPTO-Lib commit `604d4ead` (`models/qwen3_14b/`). Scheduling and memory-path changes only; no arithmetic changes:
+`patches/champion.diff` — a unified diff against PyPTO-Lib commit `604d4ead` (`models/qwen3_14b/`), covering scheduling and memory-path behavior:
 
 - Cache-policy bypass on decode-path weight projections (q / k / v / gate / up / down)
 - Joint scheduling across the gate and up projections
 - Cache bypass on the lm_head weight
-- Minor loop restructuring in the MLP path
+- Loop restructuring in the MLP path
 
 Apply on top of that commit with `git apply patches/champion.diff`.
 
 ### How it was developed
 
-Produced by an autonomous, agent-driven optimization loop rather than manual tuning: proposals are generated, debated, implemented, and measured against a moving best-known configuration; above-threshold findings are composed and re-measured before replacing the reference point. The loop is continuously updated — new measurements land here as they are produced.
+Produced by an autonomous, agent-driven optimization loop: proposals are generated, debated, implemented, and measured against a moving best-known configuration; above-threshold findings are composed and re-measured before replacing the reference point. The loop is continuously updated — new measurements land here as they are produced.
 
-Measurement discipline: three independent time windows must agree, generated tokens must be identical to the baseline, and aggregate throughput must not regress. Crashes and infrastructure faults are recorded separately and never counted against a candidate.
+Measurement discipline: three independent time windows must agree, generated tokens must be identical to the baseline, and aggregate throughput must hold. Crashes and infrastructure faults are recorded separately from candidate outcomes.
 
 See `docs/method.md` for the search method and `docs/layers.md` for how this work maps onto the operator-to-serving stack.
 
@@ -51,19 +51,6 @@ evidence/agentx/        # raw InferenceX/AIPerf harness output
 docs/method.md          # search method
 docs/layers.md          # positioning across the operator→serving layers
 ```
-
-### Roadmap
-
-- [x] Champion validated on the internal frozen workload (+4.43%)
-- [x] Cross-checked with the InferenceX harness
-- [ ] Full top-5 comparison table at the official InferenceX shape
-- [ ] Sealed-holdout confirmation
-- [ ] Upstream pull request to PyPTO-Lib
-- [ ] Same method applied to DeepSeek V4-Flash
-
-### Disclaimer
-
-Unofficial results, measured on our own hardware and configuration. For the official InferenceX results, see [SemiAnalysisAI/InferenceX](https://github.com/SemiAnalysisAI/InferenceX).
 
 ### License
 
@@ -89,20 +76,20 @@ Apache-2.0
 
 ### 补丁内容
 
-`patches/champion.diff` — 针对 PyPTO-Lib commit `604d4ead`（`models/qwen3_14b/`）的 unified diff。全部是调度与内存路径类调整，无任何算术改动：
+`patches/champion.diff` — 针对 PyPTO-Lib commit `604d4ead`（`models/qwen3_14b/`）的 unified diff，覆盖调度与内存路径行为：
 
 - decode 路径上 q / k / v / gate / up / down 投影的权重 cache 旁路
 - gate 与 up 投影的联合调度（依赖合并）
 - lm_head 权重 cache 旁路
-- MLP 路径的循环结构微调
+- MLP 路径的循环结构调整
 
 在该 commit 之上 `git apply patches/champion.diff` 即可使用。
 
 ### 开发方式
 
-不是人工调参。由 agent 驱动的自动优化循环产出：提案、辩论、实现、测量围绕一个不断移动的最优配置进行；超过阈值的发现先组合堆叠、再复测，超过旧基准才替换基准。循环持续更新——新的测量一经产出就会更新到本仓。
+由 agent 驱动的自动优化循环产出：提案、辩论、实现、测量围绕一个不断移动的最优配置进行；超过阈值的发现先组合堆叠、再复测，超过旧基准才替换基准。循环持续更新——新的测量一经产出就会更新到本仓。
 
-测量纪律：三个独立时间窗必须同向、生成 token 必须与基线完全一致、聚合吞吐不得回退；崩溃与基建故障分开记录，绝不算到候选头上。
+测量纪律：三个独立时间窗必须同向、生成 token 必须与基线完全一致、聚合吞吐必须保持；崩溃与基建故障与候选结果分开记录。
 
 搜索方法见 `docs/method.md`，在算子到 serving 的分层定位见 `docs/layers.md`。
 
@@ -116,19 +103,6 @@ evidence/agentx/        # InferenceX/AIPerf 原始测量输出
 docs/method.md          # 搜索方法
 docs/layers.md          # 算子到 serving 的分层定位
 ```
-
-### 路线图
-
-- [x] 内部冻结工作点验证（+4.43%）
-- [x] InferenceX 框架交叉验证
-- [ ] 官方形状的 top5 完整对比表
-- [ ] 密封 holdout 复核
-- [ ] 向上游 PyPTO-Lib 提交 PR
-- [ ] 同方法复测 DeepSeek V4-Flash
-
-### 免责
-
-非官方结果（Unofficial），在我们自己的硬件与配置上测得。官方 InferenceX 结果以 [SemiAnalysisAI/InferenceX](https://github.com/SemiAnalysisAI/InferenceX) 为准。
 
 ### 许可证
 
