@@ -47,6 +47,7 @@ See `docs/method.md` for the search method and `docs/layers.md` for how this wor
 patches/champion.diff   # the optimization, ready to git apply
 evidence/protocol.md    # measurement protocol
 evidence/results.md     # full results
+evidence/reproduce.md   # how to reproduce
 evidence/agentx/        # raw InferenceX/AIPerf harness output
 docs/method.md          # search method
 docs/layers.md          # positioning across the operator→serving layers
@@ -99,6 +100,7 @@ Apache-2.0
 patches/champion.diff   # 优化补丁，可直接 git apply
 evidence/protocol.md    # 测量协议
 evidence/results.md     # 完整结果
+evidence/reproduce.md   # 复现方法
 evidence/agentx/        # InferenceX/AIPerf 原始测量输出
 docs/method.md          # 搜索方法
 docs/layers.md          # 算子到 serving 的分层定位
